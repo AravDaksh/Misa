@@ -1,5 +1,12 @@
 <?php
 
+$input = json_decode(file_get_contents('php://input'), true);
+ignore_user_abort(true);
+header('Content-Type: application/json');
+http_response_code(200);
+echo json_encode(['ok' => true]);
+flush(); // respond immediately so Telegram doesn't retry
+
 ini_set('log_errors', 1);
 ini_set('error_log', 'php-error.log');
 
