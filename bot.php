@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/vendor/autoload.php';
+
 // ===== FIXED HEADER FOR RENDER COMPATIBILITY =====
 if (!isset($GLOBALS['update'])) {
     $input = file_get_contents("php://input");
