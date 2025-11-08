@@ -35,9 +35,26 @@ $bot = new TelegramBot(BOT_TOKEN, BOT_LOGS, BOT_GROUP);
 
 $bot->dbInfo(DB_HOST, DB_DATABASE, DB_USERNAME, DB_PASSWORD);
 
-$update = isset($argv[1]) && !empty($argv[1]) ? base64_decode($argv[1]) : file_get_contents('php://input');
+// -----------------------------
+// Use the $update from webhook.php if present
+// Otherwise fall back to CLI arg or php://input
+// -----------------------------
+if (!isset($update) || empty($update)) {
+    // If the script is invoked from CLI with base64 payload
+    if (isset($argv[1]) && !empty($argv[1])) {
+        $update = base64_decode($argv[1]);
+    } else {
+        $update = file_get_contents('php://input');
+    }
+}
 
-$bot->setData($update);
+// Ensure setData receives a JSON string (telegram class expects JSON string)
+$raw_update = is_array($update) ? json_encode($update) : $update;
+
+$bot->setData($raw_update);
+
+// optional debug line (keeps a trace that bot.php was invoked)
+file_put_contents(__DIR__ . '/debug.log', date('Y-m-d H:i:s') . " | bot.php setData: " . substr($raw_update, 0, 200) . "\n", FILE_APPEND);
 
 require 'classes/CurlX.php';
 require 'classes/Response.php';
