@@ -18,6 +18,8 @@ $input = json_decode($data, true);
 if ($input) {
     // Make Telegram input globally accessible (for bot.php)
     $GLOBALS['input_data'] = $input;
+    
+file_put_contents(__DIR__ . '/debug.log', print_r($input, true), FILE_APPEND);
 
     // ✅ Correct relative path (same directory)
     require_once __DIR__ . '/bot.php';
