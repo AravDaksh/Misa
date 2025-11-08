@@ -20,6 +20,6 @@ if ($input) {
     $GLOBALS['input_data'] = $input;
 
     // ✅ Correct relative path (same directory)
-    require_once __DIR__ . '/inline.php';
+    require_once __DIR__ . '/bot.php';
 }
 ?>
