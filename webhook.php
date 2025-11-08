@@ -3,20 +3,28 @@ ignore_user_abort(true);
 header('Content-Type: application/json');
 http_response_code(200);
 echo json_encode(['ok' => true]);
-flush(); // respond immediately so Telegram doesn’t retry
+flush(); // respond immediately to Telegram
 
 ini_set('log_errors', 1);
 ini_set('error_log', __DIR__ . '/php-error.log');
 
+// Read input
 $data = file_get_contents('php://input');
-$input = json_decode($data, true);
+if (!$data) {
+    $data = json_encode($_POST ?? []);
+}
 
-// Optional: debug log to verify Telegram messages arrive
-file_put_contents(__DIR__ . '/debug.log', print_r($input, true), FILE_APPEND);
+file_put_contents(__DIR__ . '/debug.log', date('Y-m-d H:i:s') . " | Input: $data\n", FILE_APPEND);
 
-// Run the bot logic inline (Render-safe)
-if ($input) {
-    $GLOBALS['input_data'] = $input;
+// Decode and pass to bot
+$update = json_decode($data, true);
+if (!empty($update)) {
+    // Make $update available to bot.php
+    $GLOBALS['update'] = $update;
+
+    // Safely include your bot logic
     require_once __DIR__ . '/bot.php';
+} else {
+    file_put_contents(__DIR__ . '/debug.log', date('Y-m-d H:i:s') . " | Empty update received\n", FILE_APPEND);
 }
 ?>
