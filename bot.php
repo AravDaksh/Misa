@@ -1,4 +1,26 @@
 <?php
+// ===== FIXED HEADER FOR RENDER COMPATIBILITY =====
+if (!isset($GLOBALS['update'])) {
+    $input = file_get_contents("php://input");
+    $update = json_decode($input, true);
+} else {
+    $update = $GLOBALS['update'];
+}
+
+if (empty($update)) {
+    file_put_contents(__DIR__ . '/debug.log', date('Y-m-d H:i:s') . " | bot.php received empty update\n", FILE_APPEND);
+    exit;
+}
+
+// Optional safety — catch fatal errors
+register_shutdown_function(function() {
+    $err = error_get_last();
+    if ($err) {
+        file_put_contents(__DIR__ . '/debug.log', date('Y-m-d H:i:s') . " | Fatal error: " . print_r($err, true) . "\n", FILE_APPEND);
+    }
+});
+
+file_put_contents(__DIR__ . '/debug.log', date('Y-m-d H:i:s') . " | bot.php running. Update: " . json_encode($update) . "\n", FILE_APPEND);
 
 ini_set('log_errors', 1);
 ini_set('error_log', 'php-error.log');
